@@ -1,0 +1,20 @@
+{
+  "name": "paralleljs",
+  "version": "0.0.0",
+  "authors": [
+    "levithomason <me@levithomason.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "paralleljs": "*",
+    "jquery": "~2.1.4",
+    "lodash": "~3.10.1"
+  }
+}
