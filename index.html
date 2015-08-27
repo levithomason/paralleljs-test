@@ -8,30 +8,36 @@
   <script src="bower_components/lodash/lodash.min.js"></script>
   <script>
     $(document).ready(function() {
-      var resultsElm = $('pre');
+      var resultsElm = $('#results');
 
       window.print = function(string) {
-        resultsElm.prepend('<p>' + string.join('\n') + '\n--------------------\n' + '</p>');
+        resultsElm.prepend(
+          '<p>' +
+          string.join('\n') +
+          '\n-------------------------------\n' +
+          '</p>'
+        );
       };
 
-      window.test = function(times) {
-        var arr = _.times(times);
-        var results = ['Loops: ' + times];
+      window.test = function(arraySize) {
+        var arr = _.times(arraySize);
+        var results = ['arr.length: ' + arraySize];
 
         //
         // Series
         //
-        // var serStart = Date.now();
-        // arr.map(function() {
-        //   var final = [];
-        //   for (var i = 0; i < 1000; i += 1) {
-        //     final.push(Math.exp(Math.random() * Math.E / (1 - Math.E)));
-        //     final.reverse();
-        //   }
-        //   return final;
-        // });
-        // var serDuration = Date.now() - serStart;
-        // results.push('series time: ' + serDuration);
+        var serStart = Date.now();
+        arr.map(function() {
+          var final = [];
+          for (var i = 0; i < 500; i++) {
+            final.push(Math.exp(Math.random() * Math.E / (1 - Math.E)));
+            final.reverse();
+            final.unshift(final.pop());
+          }
+          return final;
+        });
+        var serDuration = Date.now() - serStart;
+        results.push('series    : ' + serDuration + 'ms');
 
         //
         // Parallel
@@ -40,15 +46,20 @@
         var par = new Parallel(arr);
         par.map(function parMap() {
           var final = [];
-          for (var i = 0; i < 1000; i += 1) {
+          for (var i = 0; i < 500; i++) {
             final.push(Math.exp(Math.random() * Math.E / (1 - Math.E)));
             final.reverse();
+            final.unshift(final.pop());
           }
           return final;
         })
           .then(function() {
             var parDuration = Date.now() - parStart;
-            results.push('parallel time: ' + parDuration);
+            var winner = (serDuration > parDuration ? 'PARALLEL' : serDuration < parDuration ? 'SERIES' : 'TIE');
+            var difference = Math.abs(serDuration - parDuration) + 'ms';
+
+            results.push('parallel  : ' + parDuration + 'ms');
+            results.push('winner    : ' + winner + ' by ' + difference);
             print(results)
           });
       }
@@ -57,13 +68,22 @@
 </head>
 <body>
 <h1>ParallelJS vs Native [].map()</h1>
-
-<button onclick="test(10)">Test(10)</button>
-<button onclick="test(100)">Test(100)</button>
-<button onclick="test(1000)">Test(1000)</button>
-<button onclick="test(10000)">Test(10000)</button>
+<button onclick="test(10)">Test Array(10)</button>
+<button onclick="test(100)">Test Array(100)</button>
+<button onclick="test(1000)">Test Array(1000)</button>
+<button onclick="test(10000)">Test Array(10000)</button>
+<br />
+<pre>arr.map(function() {
+  var final = [];
+  for (var i = 0; i < 500; i++) {
+    final.push(Math.exp(Math.random() * Math.E / (1 - Math.E)));
+    final.reverse();
+    final.unshift(final.pop());
+  }
+  return final;
+});</pre>
 <hr />
-<pre></pre>
+<pre id="results"></pre>
 
 </body>
 </html>
